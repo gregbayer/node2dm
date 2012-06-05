@@ -11,6 +11,7 @@
  * serverCallbackHost / serverCallbackPort / serverCallbackPath / serverCallbackSharedSecret /
  * serverCallbackProtocol
  * (if specified, will be used to send a POST back to a service in order to handle bad tokens)
+ * httpPostPort (optional: port to bind to accept C2DM messages via Http POST request)
  *
  */
  

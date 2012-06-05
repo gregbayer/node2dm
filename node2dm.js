@@ -61,6 +61,51 @@ function C2DMReceiver(config, connection) {
 }
 
 
+function C2DMHttpPostReceiver(config, connection) {
+    onRequest = function onRequest(request, response) {
+    	try {
+	        var postData = "";
+	        request.setEncoding("utf8");
+
+	        request.addListener("data", function(postDataChunk) {
+	          postData += postDataChunk;
+	        });
+
+	        request.addListener("end", function() {
+	        	try {
+		        	params = querystring.parse(postData)
+		            var token = params.token;
+		            var collapseKey = params.collapseKey;
+		            var notification = params.notification;
+		            
+		            var c2dmMessage = new C2DMMessage(token, collapseKey, notification);
+		            connection.notifyDevice(c2dmMessage);
+					response.end();
+					return;
+	        	}
+		        catch(e)
+		        {
+		        	log('Invalid C2DM POST message: ' + e.stack);
+		        	response.writeHead(400);
+		        	response.end();
+			        return;
+		        }
+	        });
+    	}
+		catch(e)
+		{
+			log('Error in C2DMHttpPostReceiver: ' + e.stack);
+			response.writeHead(500);
+			response.end();
+	        return;
+		}
+    };
+	this.server = http.createServer(onRequest)
+    this.server.listen(config.httpPostPort);
+    log("HTTP POST server is up");
+}
+
+
 function C2DMConnection(config) {
 
     var self = this;
@@ -404,5 +449,8 @@ fs.stat('quota.lock', function(err, stats) {
 
     var connection = new C2DMConnection(config);
     var receiver = new C2DMReceiver(config, connection);
+    if (config.httpPostPort) {
+    	var http_post_receiver = new C2DMHttpPostReceiver(config, connection);
+    }
 });
 
