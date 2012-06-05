@@ -215,7 +215,7 @@ function C2DMConnection(config) {
         var c2dmPostBody = {
             registration_id: message.deviceToken,
             collapse_key: message.collapseKey,
-            "data.data": message.notification,
+            "data.data": message.notification
         }
 
         var stringBody = querystring.stringify(c2dmPostBody);
