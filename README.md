@@ -33,6 +33,25 @@ As you can see from the example, the datagram looks as follows:
 
 We chose UDP because we wanted to minimize latency between our application servers and the node2dm service, and don't have hard delivery requirements for push notifications.
 
+Pushing a message (via HTTP POST)
+-------
+It is also possible to push messages to the service via HTTP POST request. To enable this, simply set the httpPostPort in the config file.
+
+Heres a basic usage example based on the socket example above:
+
+    post_data = {
+        'token': device_token,
+        'collapseKey': collapse_key,
+        'notification': simplejson.encode(c2dm_payload)
+    }
+    # Build request
+    data = urllib.urlencode(post_data)
+    request = urllib2.Request('http://localhost:8122', data)
+
+    # Post
+    response = urllib2.urlopen(request)
+    response_as_string = response.read()
+
 Rate limits / errors
 ------
 
